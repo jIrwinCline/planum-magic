@@ -1,8 +1,9 @@
 const functions = require('firebase-functions');
-const admin = require('firebase-admin');
+
 
 const app = require('express')();
-admin.initializeApp();
+
+const {getAllPosts } = require('./handlers/posts');
 
 var firebaseConfig = {
   apiKey: "AIzaSyDMLR-QTpzz8WDMrAS4A1j9UJj8Ea_bXfM",
@@ -18,7 +19,7 @@ var firebaseConfig = {
 const firebase = require('firebase')
 firebase.initializeApp(firebaseConfig);
 
-const db = admin.firestore();
+
 
 //helper functions
 
@@ -27,33 +28,9 @@ const isEmpty = string => {
   else return false;
 };
 
-// GET ALL posts route
+// Posts Routes
 
-app.get('/posts', (req,res) => {
-    db
-      .collection("posts")
-      .orderBy('createdAt', 'desc')
-      .get()
-      .then(data => {
-        let posts = [];
-        data.forEach(doc => {
-          posts.push({
-            postId: doc.id,
-            name: doc.data().name,
-            images: doc.data().images,
-            link: doc.data().link,
-            info: doc.data().info,
-            price: doc.data().price,
-            itemCategory:doc.data().itemCategory,
-            available: doc.data().available,
-            highEnd: doc.data().highEnd,
-            createdAt: doc.data().createdAt
-          });
-        });
-        return res.json(posts);
-      })
-      .catch(err => console.error(err));
-});
+app.get('/posts', getAllPosts);
 
 
 const FBAuth = (req, res, next) => {
