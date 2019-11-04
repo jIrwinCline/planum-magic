@@ -3,43 +3,51 @@ const admin = require('firebase-admin');
 
 admin.initializeApp();
 
-// // Create and Deploy Your First Cloud Functions
-// // https://firebase.google.com/docs/functions/write-firebase-functions
-//
-// exports.helloWorld = functions.https.onRequest((request, response) => {
-//  response.send("Hello from Firebase!");
-// });
+const express = require('express');
+const app = express();
 
 // GET ALL posts route
 
-exports.getPosts = functions.https.onRequest((req, res) => {
-  admin.firestore().collection("posts")
-    .get()
-    .then(data => {
-      let posts = [];
-      data.forEach(doc => {
-        posts.push(doc.data());
-      });
-      return res.json(posts);
-    })
-    .catch(err => console.error(err));
+app.get('/posts', (req,res) => {
+    admin
+      .firestore()
+      .collection("posts")
+      .get()
+      .then(data => {
+        let posts = [];
+        data.forEach(doc => {
+          posts.push({
+            postId: doc.id,
+            name: doc.data().name,
+            images: doc.data().images,
+            link: doc.data().link,
+            info: doc.data().info,
+            price: doc.data().price,
+            itemCategory:doc.data().itemCategory,
+            available: doc.data().available,
+            highEnd: doc.data().highEnd,
+            createdAt: doc.data().createdAt
+          });
+        });
+        return res.json(posts);
+      })
+      .catch(err => console.error(err));
 });
 
 // CREATE Post route
 
-exports.createPost = functions.https.onRequest((req, res) => {
-  
-const newPost = {
-  name: req.body.name,
-  images: req.body.images,
-  link: req.body.link,
-  info: req.body.info,
-  price: req.body.price,
-  itemCategory: req.body.itemCategory,
-  available: req.body.available,
-  highEnd: req.body.highEnd,
-  createdAt: new Date().toISOString()
-};
+app.post('/post', (req, res) => {
+    const newPost = {
+    name: req.body.name,
+    images: req.body.images,
+    link: req.body.link,
+    info: req.body.info,
+    price: req.body.price,
+    itemCategory: req.body.itemCategory,
+    available: req.body.available,
+    highEnd: req.body.highEnd,
+    createdAt: new Date().toISOString()
+    };
   admin
     .firestore()
     .collection("posts")
@@ -53,14 +61,4 @@ const newPost = {
     });
 });
 
-// const newPost = {
-//   name: req.body.name,
-//   images: req.body.images,
-//   link: req.body.link,
-//   info: req.body.info,
-//   price: req.body.price,
-//   itemCategory: req.body.itemCategory,
-//   available: req.body.available,
-//   highEnd: req.body.highEnd,
-//   createdAt: new Date().toISOString()
-// };
+exports.api = functions.https.onRequest(app)
