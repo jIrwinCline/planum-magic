@@ -24,3 +24,26 @@ exports.getAllPosts = (req, res) => {
     })
     .catch(err => console.error(err));
 };
+
+exports.createOnePost = (req, res) => {
+  const newPost = {
+    name: req.body.name,
+    images: req.body.images,
+    link: req.body.link,
+    info: req.body.info,
+    price: req.body.price,
+    itemCategory: req.body.itemCategory,
+    available: req.body.available,
+    highEnd: req.body.highEnd,
+    createdAt: new Date().toISOString()
+  };
+  db.collection("posts")
+    .add(newPost)
+    .then(doc => {
+      res.json({ message: `document ${doc.id} created successfully` });
+    })
+    .catch(err => {
+      res.status(500).json({ error: "something went wrong" });
+      console.error(err);
+    });
+};
