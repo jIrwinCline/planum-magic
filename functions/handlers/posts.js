@@ -1,4 +1,4 @@
-const { db } = require('../util/admin');
+const { admin, db } = require('../util/admin');
 
 exports.getAllPosts = (req, res) => {
   db.collection("posts")
@@ -26,9 +26,10 @@ exports.getAllPosts = (req, res) => {
 };
 
 exports.createOnePost = (req, res) => {
+
   const newPost = {
     name: req.body.name,
-    images: req.body.images,
+    images: null,
     link: req.body.link,
     info: req.body.info,
     price: req.body.price,
@@ -37,6 +38,56 @@ exports.createOnePost = (req, res) => {
     highEnd: req.body.highEnd,
     createdAt: new Date().toISOString()
   };
+    const BusBoy = require("busboy");
+    const path = require("path");
+    const os = require("os");
+    const fs = require("fs");
+
+    const busboy = new BusBoy({ headers: req.headers });
+
+    let imageFileName;
+    let imageToBeUploaded = {};
+
+    busboy.on("file", (fieldname, file, filename, encoding, mimetype) => {
+        if (mimetype !== "image/jpeg" && mimetype !== "image/png") {
+        return res.status(400).json({ error: "Wrong file type submitted" });
+        }
+        //img png
+        const imageExtension = filename.split(".")[
+        filename.split(".").length - 1
+        ];
+        imageFileName = `${Math.round(
+        Math.random() * 1000000000000
+        ).toString()}.${imageExtension}`;
+        const filepath = path.join(os.tmpdir(), imageFileName);
+        imageToBeUploaded = { filepath, mimetype };
+        file.pipe(fs.createWriteStream(filepath));
+    });
+
+    busboy.on('finish', () => {
+        admin.storage().bucket().upload(imageToBeUploaded.filepath, {
+            resumable: false,
+            metadata: { 
+                metadata: {
+                    contentType: imageToBeUploaded.mimetype
+                }
+            }
+        })
+        .then(() => {
+            const imageUrl = `https://firebasestorage.googleapis.com/v0/b/${firebaseConfig.storageBucket}/o/${imageFileName}?alt=media`;
+            newPost.images = imageUrl
+            return newPost.images = imageUrl
+
+        })
+        .then(() => {
+            return res.json({ message: 'image uploaded successfully'});
+        }).catch((err) => {
+            console.error(err);
+            return res.status(500).json({ error: "Something went wrong" })
+        });
+    });
+    busboy.end(req.rawBody);
+
   db.collection("posts")
     .add(newPost)
     .then(doc => {
