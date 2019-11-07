@@ -4,13 +4,18 @@ const app = require('express')();
 
 const FBAuth = require('./util/fbAuth')
 
-const { getAllPosts, createOnePost } = require('./handlers/posts');
+const { getAllPosts, createOnePost, getThePost } = require('./handlers/posts');
 const { login } = require('./handlers/users');
 
 // Posts Routes
 
 app.get('/posts', getAllPosts);
+app.get('/post/:postId', getThePost);
 app.post("/post", FBAuth, createOnePost);
+
+//TODO delete post
+
+//TODO update post
 
 // Login Route
 
