@@ -66,3 +66,23 @@ exports.createOnePost = (req, res) => {
     });
 };
 
+//DELETE route
+
+exports.deletePost = (req, res) => {
+  const document = db.doc(`/posts/${req.params.postId}`);
+  document.get()
+    .then(doc => {
+      if(!doc.exists){
+        return res.status(404).json({ error: "Post was not found" });
+      }
+      return document.delete();
+    })
+    .then(() => {
+      res.json({ message: "Successfully deleted" });
+    })
+    .catch((err) => {
+      console.error(err);
+      return res.status(500).json({ error: err.code })
+    })
+}
+
