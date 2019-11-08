@@ -4,7 +4,7 @@ const app = require('express')();
 
 const FBAuth = require('./util/fbAuth')
 
-const { getAllPosts, createOnePost, getThePost } = require('./handlers/posts');
+const { getAllPosts, createOnePost, getThePost, deletePost } = require('./handlers/posts');
 const { login } = require('./handlers/users');
 
 // Posts Routes
@@ -12,6 +12,7 @@ const { login } = require('./handlers/users');
 app.get('/posts', getAllPosts);
 app.get('/post/:postId', getThePost);
 app.post("/post", FBAuth, createOnePost);
+app.delete('/post/:postId', FBAuth, deletePost);
 
 //TODO delete post
 
