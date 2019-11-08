@@ -25,6 +25,24 @@ exports.getAllPosts = (req, res) => {
     .catch(err => console.error(err));
 };
 
+exports.getThePost = (req, res) => {
+  let postData = {};
+  db.doc(`/posts/${req.params.postId}`)
+    .get()
+    .then(doc => {
+      if (!doc.exists) {
+        return res.status(404).json({ error: "Post not Found" });
+      }
+      postData = doc.data();
+      // postData.postId = doc.id;
+      return res.json(postData);
+    })
+    .catch(err => {
+      console.error(err);
+      return res.status(500).json({ error: err.code });
+    });
+};
+
 exports.createOnePost = (req, res) => {
   const newPost = {
     name: req.body.name,
@@ -47,3 +65,4 @@ exports.createOnePost = (req, res) => {
       console.error(err);
     });
 };
+
