@@ -44,6 +44,30 @@ exports.getThePost = (req, res) => {
 };
 
 exports.createOnePost = (req, res) => {
+  if (req.body.name.trim() === "") {
+    return res.status(400).json({ body: "name must not be empty" });
+  }
+  if (req.body.images.trim() === "") {
+    return res.status(400).json({ body: "images must not be empty" });
+  }
+  if (req.body.link.trim() === "") {
+    return res.status(400).json({ body: "link must not be empty" });
+  }
+  if (req.body.info.trim() === "") {
+    return res.status(400).json({ body: "info must not be empty" });
+  }
+  if (req.body.price.trim() === "") {
+    return res.status(400).json({ body: "price must not be empty" });
+  }
+  if (req.body.itemCategory.trim() === "") {
+    return res.status(400).json({ body: "itemCategory must not be empty" });
+  }
+  if (req.body.available.trim() === "") {
+    return res.status(400).json({ body: "available must not be empty" });
+  }
+  if (req.body.highEnd.trim() === "") {
+    return res.status(400).json({ body: "highEnd must not be empty" });
+  }
   const newPost = {
     name: req.body.name,
     images: req.body.images,
