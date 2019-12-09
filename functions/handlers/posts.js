@@ -131,7 +131,7 @@ exports.uploadImage = (req, res) => {
 
   let imageToBeUploaded = {};
   let imageFileName;
-  
+  // res.send("this worked");
   busboy.on("file", (fieldname, file, filename, encoding, mimetype) => {
     console.log(fieldname, file, filename, encoding, mimetype);
     if (mimetype !== "image/jpeg" && mimetype !== "image/png") {
@@ -161,8 +161,10 @@ exports.uploadImage = (req, res) => {
         }
       })
       .then(() => {
-        const images = `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/${imageFileName}?alt=media`;
-        return db.doc(`/posts/${req.params.postId}`).update({ images });
+        const image = `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/${imageFileName}?alt=media`;
+        return db
+          .doc(`/posts/${req.params.postId}`)
+          .update({ images: admin.firestore.FieldValue.arrayUnion(image) });
       })
       .then(() => {
         return res.json({ message: "image uploaded successfully" });
