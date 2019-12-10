@@ -1,4 +1,5 @@
-const { db } = require('../util/admin');
+const { admin, db } = require('../util/admin');
+const config = require("../util/config");
 
 exports.getAllPosts = (req, res) => {
   db.collection("posts")
@@ -17,6 +18,7 @@ exports.getAllPosts = (req, res) => {
           itemCategory: doc.data().itemCategory,
           available: doc.data().available,
           highEnd: doc.data().highEnd,
+          featured: doc.data().featured,
           createdAt: doc.data().createdAt
         });
       });
@@ -77,6 +79,7 @@ exports.createOnePost = (req, res) => {
     itemCategory: req.body.itemCategory,
     available: req.body.available,
     highEnd: req.body.highEnd,
+    featured: req.body.featured,
     createdAt: new Date().toISOString()
   };
   db.collection("posts")
@@ -109,4 +112,68 @@ exports.deletePost = (req, res) => {
       return res.status(500).json({ error: err.code })
     })
 }
+
+//Upload images
+
+exports.uploadImage = (req, res) => {
+
+  // res.send("this worked"); // everything works up to this point
+
+  const Busboy = require("busboy");
+  
+  const path = require("path");
+  
+  const os = require("os");
+
+  const fs = require("fs");
+  
+  const busboy = new Busboy({ headers: req.headers });
+
+  let imageToBeUploaded = {};
+  let imageFileName;
+  // res.send("this worked");
+  busboy.on("file", (fieldname, file, filename, encoding, mimetype) => {
+    console.log(fieldname, file, filename, encoding, mimetype);
+    if (mimetype !== "image/jpeg" && mimetype !== "image/png") {
+      return res.status(400).json({ error: "Wrong file type submitted" });
+    }
+    // my.image.png => ['my', 'image', 'png']
+    const imageExtension = filename.split(".")[filename.split(".").length - 1];
+    // 32756238461724837.png
+    imageFileName = `${Math.round(
+      Math.random() * 1000000000000
+    ).toString()}.${imageExtension}`;
+    const filepath = path.join(os.tmpdir(), imageFileName);
+    imageToBeUploaded = { filepath, mimetype };
+    file.pipe(fs.createWriteStream(filepath));
+    
+  });
+  busboy.on("finish", () => {
+    admin
+      .storage()
+      .bucket()
+      .upload(imageToBeUploaded.filepath, {
+        resumable: false,
+        metadata: {
+          metadata: {
+            contentType: imageToBeUploaded.mimetype
+          }
+        }
+      })
+      .then(() => {
+        const image = `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/${imageFileName}?alt=media`;
+        return db
+          .doc(`/posts/${req.params.postId}`)
+          .update({ images: admin.firestore.FieldValue.arrayUnion(image) });
+      })
+      .then(() => {
+        return res.json({ message: "image uploaded successfully" });
+      })
+      .catch(err => {
+        console.error(err);
+        return res.status(500).json({ error: "something went wrong" });
+      });
+  });
+  busboy.end(req.rawBody);
+};
 
