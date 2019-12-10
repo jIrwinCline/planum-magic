@@ -4,6 +4,10 @@ const app = require('express')();
 
 const FBAuth = require('./util/fbAuth')
 
+const cors = require('cors');
+app.use(cors());
+
+
 const { getAllPosts, createOnePost, getThePost, deletePost, uploadImage } = require('./handlers/posts');
 const { login } = require('./handlers/users');
 
