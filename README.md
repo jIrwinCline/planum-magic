@@ -1,6 +1,6 @@
 # Planum Magic API
 
-This is a backend service built with Node, Express, and Firebase to support a front end client for small artistic merchandising company.
+This is a backend service built with Node, Express, and Firebase to support a front end client for small artistic merchandising company. This version lacks the credentials to affect the original database but may serve as a templatefor other APIs with firebase.
 
 View Hosted Client here:
 * [Planum Magic](https://planum-magic.firebaseapp.com/)
@@ -15,7 +15,7 @@ If you wish to use the project as a template to create your own project, lease f
 5. Type `npm install` in terminal to load node packages
 10. To run the program, run $ `npm run start` in terminal
 11. The API will now be locally hosted at localhost:3000
-12. You can edit the code at this point to be attached to your own backend database
+12. You can edit the code at this point to be attached to your own backend database. Specifically you'll need to add a firebase.config file.
 12. The best way to make an API request will be to use a program such as Postman
 
 ## API calls
