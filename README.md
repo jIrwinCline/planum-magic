@@ -2,6 +2,9 @@
 
 This is a backend service built with Node, Express, and Firebase to support a front end client for small artistic merchandising company.
 
+View Hosted Client here:
+* [Planum Magic](https://planum-magic.firebaseapp.com/)
+
 ## Getting Started and Installing
 
 If you wish to use the project as a template to create your own project, lease follow:
