@@ -15,6 +15,7 @@ If you wish to use the project as a template to create your own project, lease f
 5. Type `npm install` in terminal to load node packages
 10. To run the program, run $ `npm run start` in terminal
 11. The API will now be locally hosted at localhost:3000
+12. You can edit the code at this point to be attached to your own backend database
 12. The best way to make an API request will be to use a program such as Postman
 
 ## API calls
